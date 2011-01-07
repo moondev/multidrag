@@ -1,0 +1,117 @@
+<?php
+
+
+function multidrag_admin() {
+
+$ops = array();
+
+  $result1 = db_query(db_rewrite_sql("SELECT * FROM {content_node_field} WHERE type = 'nodereference'"));
+  while ($ctype = db_fetch_object($result1)) {
+   $ops[$ctype->field_name] = $ctype->field_name;
+  }
+  
+
+$form['multidrag_ccktypes'] = array(
+'#type' => 'select',
+'#default_value' => variable_get('multidrag_ccktypes',''),
+'#title' => t('auto-complete node reference fields'),
+'#description' => t('Select which autocomplete node references will be replaced with drop-downs.'),
+'#options' => $ops,
+'#multiple' => true
+);
+
+
+return system_settings_form($form);
+}
+
+function multidrag_getdragnodes($arg) {
+
+$result1 = db_query(db_rewrite_sql("SELECT * FROM {content_node_field} WHERE field_name = '" . $arg . "'"));
+$result1 = db_fetch_object($result1);  
+ /*
+  while ($ctype = db_fetch_object($result1)) {
+   $ops[$ctype->field_name] = $ctype->field_name;
+  }
+  */
+  
+  //must be some correct way to parse the settings string??? plus this only grabs the first node type selected
+  $settings = $result1->global_settings;
+  $settings = explode('{',$settings);
+  $settings = $settings[2];
+  $settings = explode('"',$settings);
+  $settings = $settings[1];
+  
+  $result2 = db_query(db_rewrite_sql("SELECT * FROM {node} WHERE type = '" . $settings . "' ORDER BY title ASC"));
+  
+  $jsonout = '{';
+  
+  while ($noderef = db_fetch_object($result2)) {
+  $jsonout .= '"' . $noderef->title . ' [nid:' . $noderef->nid . ']":"nulldiv",';
+  }
+  //trim last comma off
+  $jsonout = substr($jsonout, 0, -1);
+  
+  $jsonout .= '}';
+
+
+die($jsonout);
+  return '';
+}
+
+
+function multidrag_menu() {
+
+  $items = array();
+
+  $items['admin/settings/multidrag'] = array(
+    'title' => 'MultiDrag Settings',
+    'description' => 'Choose which fields multidrag uses',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('multidrag_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+   
+  
+     $items['getdragnodes'] = array(
+    'title' => 'testpage', 
+    'page callback' => 'multidrag_getdragnodes',  
+    'access arguments' => array('access administration pages'), 
+    'type' => MENU_CALLBACK
+  );
+
+
+  return $items;
+}
+
+
+function multidrag_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+	
+//echo $node->type;
+ 
+//echo $node->type;
+ if($op == 'prepare'){
+
+	function multidrag_footer($main = 0) {
+	
+	$out = '<script>';
+	 $types = variable_get('multidrag_ccktypes','');
+	
+	$out .= 'var multidrags = new Array("nulldiv"';
+	foreach($types as $type){
+	$out .= ',"' . $type . '"';
+	}
+	$out .= ');';
+
+ 
+  $out .= '</script><script src="/sites/all/modules/multidrag/js/multidrag.js"></script>';
+			
+		return $out;
+ 
+}
+
+	
+
+ 
+}  
+}

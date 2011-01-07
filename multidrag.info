@@ -1,0 +1,9 @@
+; $id$
+name = "Multi Drag"
+description = "Transforms auto-complete node reference fields into select drop-downs"
+core = 6.x
+php = 5.1
+
+dependencies[] = nodereference
+package = Node Reference
+core = 6.x
