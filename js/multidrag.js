@@ -98,7 +98,7 @@ String.prototype.replaceAll = function(
   	for(var dragitem in multidrags){
   	
   	
-  	$.ajax({ url: "/getdragnodes/" + multidrags[dragitem]
+  	$.ajax({ url: "/index.php?q=getdragnodes/" + multidrags[dragitem]
   	, async: false
   	, dataType: "json"
   	, success: function(data){

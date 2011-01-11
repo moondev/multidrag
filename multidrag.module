@@ -24,24 +24,27 @@ $form['multidrag_ccktypes'] = array(
 return system_settings_form($form);
 }
 
+
 function multidrag_getdragnodes($arg) {
 
 $result1 = db_query(db_rewrite_sql("SELECT * FROM {content_node_field} WHERE field_name = '" . $arg . "'"));
 $result1 = db_fetch_object($result1);  
- /*
-  while ($ctype = db_fetch_object($result1)) {
-   $ops[$ctype->field_name] = $ctype->field_name;
-  }
-  */
-  
-  //must be some correct way to parse the settings string??? plus this only grabs the first node type selected
+
   $settings = $result1->global_settings;
-  $settings = explode('{',$settings);
-  $settings = $settings[2];
-  $settings = explode('"',$settings);
-  $settings = $settings[1];
+  $settings = unserialize($settings);
   
-  $result2 = db_query(db_rewrite_sql("SELECT * FROM {node} WHERE type = '" . $settings . "' ORDER BY title ASC"));
+  $qs = '';
+  
+  foreach($settings['referenceable_types'] as $ref){
+  	if($ref){
+  		$qs .= "type = '" . $ref . "' OR ";
+  	}
+  }
+  //trim last OR off end
+  $qs = substr($qs, 0, -3);
+  $qs = "SELECT * FROM {node} WHERE " . $qs . " ORDER BY title ASC";
+  
+  $result2 = db_query(db_rewrite_sql($qs));
   
   $jsonout = '{';
   
