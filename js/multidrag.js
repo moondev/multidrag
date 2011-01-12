@@ -24,14 +24,13 @@ String.prototype.replaceAll = function(
 	return( strText );
 }
   
-  
-  
-  
-  if(true){
-  
-  $ = jQuery;
-  nodelist = [];
-  $(window).load(function(){
+//get jquery context
+$ = jQuery;
+
+//hold our nodes so we dont have to ajax on every update
+nodelist = [];
+
+$(window).load(function(){
 
    makeDrops();
    
@@ -107,46 +106,8 @@ String.prototype.replaceAll = function(
    	nodesurl = multidrags[dragitem];
    	nodelist[nodesurl] = data;
    	
-   	  
-  $('#' + multidrags[dragitem] + '_values').find("input.form-autocomplete").each(function(){
-  
-  fval = $(this).attr('value');
-  
-  fid = $(this).attr('id');
-  fclass = $(this).attr('class');
-  fname = $(this).attr('name');
-  
-  dropdown = '<select id="' + fid + '" class="' + fclass + '" name="' + fname + '">';
-  dropdown = dropdown + '<option value="">--Empty--</option>';
-  
-  if(fval != ''){
-   
-   	for(var prop in nodelist[nodesurl]){
-   	isSelected = '';
-   	
-   	if(prop == fval){
-   	isSelected = ' selected ';
-   	}
-   	
-	dropdown = dropdown + '<option' + isSelected + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	} 
-  
-  }else{
-    for(var prop in nodelist[nodesurl]){	
-	dropdown = dropdown + '<option' + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	}  
-  }
-  
-  
-  dropdown = dropdown + '</select>';
-  
-  $(this).replaceWith(dropdown);
-
-  
-  });
+ 	updateDrops();
  }});  
-  
-  }
   
   }
   
