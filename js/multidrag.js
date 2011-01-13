@@ -24,130 +24,82 @@ String.prototype.replaceAll = function(
 	return( strText );
 }
   
-  
-  
-  
-  if(true){
-  
-  $ = jQuery;
-  nodelist = [];
-  $(window).load(function(){
+//get jquery context
+$ = jQuery;
 
-   makeDrops();
+//hold our nodes so we dont have to ajax on every update
+nodelist = [];
+
+//call on load when all other ajax has stopped
+$(window).load(function(){
+
+	makeDrops();
    
-     $(document).ajaxStop(function() {
-   updateDrops();
-  });
-    
-  });
+	$(document).ajaxStop(function() {
+		updateDrops();
+	});
+});
   
-  
-   function updateDrops(){
+function updateDrops(){
   	
-    	for(var dragitem in multidrags){
+for(var dragitem in multidrags){
    	
-   	nodesurl = multidrags[dragitem];
-   	
-   	  
-  $('#' + multidrags[dragitem] + '_values').find("input.form-autocomplete").each(function(){
+	nodesurl = multidrags[dragitem];
+	$('#' + multidrags[dragitem] + '_values').find("input.form-autocomplete").each(function(){
   
-  fval = $(this).attr('value');
+		fval = $(this).attr('value');
+		fid = $(this).attr('id');
+		fclass = $(this).attr('class');
+		fname = $(this).attr('name');
   
-  fid = $(this).attr('id');
-  fclass = $(this).attr('class');
-  fname = $(this).attr('name');
+		dropdown = '<select id="' + fid + '" class="' + fclass + '" name="' + fname + '">';
+		dropdown = dropdown + '<option value="">--Empty--</option>';
   
-  dropdown = '<select id="' + fid + '" class="' + fclass + '" name="' + fname + '">';
-  dropdown = dropdown + '<option value="">--Empty--</option>';
-  
-  if(fval != ''){
+		if(fval != ''){
    
-   	for(var prop in nodelist[nodesurl]){
-   	isSelected = '';
+			for(var prop in nodelist[nodesurl]){
+			isSelected = '';
    	
-   	if(prop == fval){
-   	isSelected = ' selected ';
-   	}
+				if(prop == fval){
+					isSelected = ' selected ';
+				}
    	
-	dropdown = dropdown + '<option' + isSelected + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	} 
+			dropdown = dropdown + '<option' + isSelected + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
+			} 
   
-  }else{
-    for(var prop in nodelist[nodesurl]){	
-	dropdown = dropdown + '<option' + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	}  
-  }
+		}else{
+			for(var prop in nodelist[nodesurl]){	
+				dropdown = dropdown + '<option' + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
+				}  
+		}
   
+		dropdown = dropdown + '</select>';
   
-  dropdown = dropdown + '</select>';
-  
-  $(this).replaceWith(dropdown);
+		$(this).replaceWith(dropdown);
 
-  
-  });
-  
-
-  
-  }  
-  }
+		});
   
   
-  function makeDrops(){
+}  
+}
+  
+function makeDrops(){
   	
-  	
-  	for(var dragitem in multidrags){
-  	
+	for(var dragitem in multidrags){
   	
   	$.ajax({ url: "/index.php?q=getdragnodes/" + multidrags[dragitem]
   	, async: false
   	, dataType: "json"
   	, success: function(data){
-  	
    	
    	nodesurl = multidrags[dragitem];
    	nodelist[nodesurl] = data;
    	
-   	  
-  $('#' + multidrags[dragitem] + '_values').find("input.form-autocomplete").each(function(){
-  
-  fval = $(this).attr('value');
-  
-  fid = $(this).attr('id');
-  fclass = $(this).attr('class');
-  fname = $(this).attr('name');
-  
-  dropdown = '<select id="' + fid + '" class="' + fclass + '" name="' + fname + '">';
-  dropdown = dropdown + '<option value="">--Empty--</option>';
-  
-  if(fval != ''){
-   
-   	for(var prop in nodelist[nodesurl]){
-   	isSelected = '';
-   	
-   	if(prop == fval){
-   	isSelected = ' selected ';
-   	}
-   	
-	dropdown = dropdown + '<option' + isSelected + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	} 
-  
-  }else{
-    for(var prop in nodelist[nodesurl]){	
-	dropdown = dropdown + '<option' + ' value="' + prop + '">' + prop.split('[')[0] + '</option>';
-	}  
-  }
-  
-  
-  dropdown = dropdown + '</select>';
-  
-  $(this).replaceWith(dropdown);
-
-  
-  });
- }});  
+ 	updateDrops();
+ 	
+ 	}
+ });  
   
   }
   
-  }
-  
-  }
+}
